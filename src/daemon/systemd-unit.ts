@@ -47,10 +47,13 @@ export function buildSystemdUnit({
     `ExecStart=${execStart}`,
     "Restart=always",
     "RestartSec=5",
-    // KillMode=process ensures systemd only waits for the main process to exit.
-    // Without this, podman's conmon (container monitor) processes block shutdown
-    // since they run as children of the gateway and stay in the same cgroup.
-    "KillMode=process",
+    // KillMode=control-group (systemd default) ensures the entire process tree
+    // is killed on stop/restart.  The entry-point respawns itself as a child
+    // process to inject Node CLI flags; KillMode=process would only kill the
+    // parent, orphaning the actual gateway and causing a port-conflict restart
+    // loop.  If podman containers are used, their conmon processes may delay
+    // shutdown slightly, but that is preferable to orphaned gateways.
+    "KillMode=control-group",
     workingDirLine,
     ...envLines,
     "",
