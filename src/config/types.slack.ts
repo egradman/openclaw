@@ -146,6 +146,15 @@ export type SlackAccountConfig = {
   heartbeat?: ChannelHeartbeatVisibilityConfig;
   /** Outbound response prefix override for this channel/account. */
   responsePrefix?: string;
+  /** Push notification webhook (e.g. Setae). */
+  notify?: SlackNotifyConfig;
+};
+
+export type SlackNotifyConfig = {
+  /** Endpoint URL to POST push notification events to. */
+  endpoint?: string;
+  /** Shared secret sent in the X-Notify-Secret header. */
+  secret?: string;
 };
 
 export type SlackConfig = {

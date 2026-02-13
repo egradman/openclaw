@@ -12,6 +12,7 @@ import { danger, logVerbose, shouldLogVerbose } from "../../../globals.js";
 import { removeSlackReaction } from "../../actions.js";
 import { resolveSlackThreadTargets } from "../../threading.js";
 import { createSlackReplyDeliveryPlan, deliverReplies } from "../replies.js";
+import { notifyPush } from "../setae-notify.js";
 
 export async function dispatchPreparedSlackMessage(prepared: PreparedSlackMessage) {
   const { ctx, account, message, route } = prepared;
@@ -117,6 +118,21 @@ export async function dispatchPreparedSlackMessage(prepared: PreparedSlackMessag
         replyThreadTs,
       });
       replyPlan.markSent();
+      // Notify on outbound bot replies (fire-and-forget)
+      const notify = account.config.notify;
+      if (notify) {
+        const threadTs = replyThreadTs ?? incomingThreadTs ?? messageTs;
+        notifyPush({
+          ctx,
+          message: {
+            ...message,
+            thread_ts: threadTs,
+            text: payload.text ?? "",
+            user: ctx.botUserId,
+          },
+          notify,
+        }).catch(() => {});
+      }
     },
     onError: (err, info) => {
       runtime.error?.(danger(`slack ${info.kind} reply failed: ${String(err)}`));
