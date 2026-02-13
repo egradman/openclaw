@@ -459,6 +459,13 @@ const SlackReplyToModeByChatTypeSchema = z
   })
   .strict();
 
+export const SlackNotifySchema = z
+  .object({
+    endpoint: z.string().optional(),
+    secret: z.string().optional(),
+  })
+  .strict();
+
 export const SlackAccountSchema = z
   .object({
     name: z.string().optional(),
@@ -516,6 +523,7 @@ export const SlackAccountSchema = z
     channels: z.record(z.string(), SlackChannelSchema.optional()).optional(),
     heartbeat: ChannelHeartbeatVisibilitySchema,
     responsePrefix: z.string().optional(),
+    notify: SlackNotifySchema.optional(),
   })
   .strict();
 
