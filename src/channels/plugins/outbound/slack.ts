@@ -77,6 +77,9 @@ async function sendSlackOutboundMessage(params: {
     };
   }
 
+  if (threadTs) {
+    console.error(`[slack-outbound] sending to=${params.to} threadTs=${threadTs} threadId=${params.threadId} replyToId=${params.replyToId}`);
+  }
   const slackIdentity = resolveSlackSendIdentity(params.identity);
   const result = await send(params.to, hookResult.text, {
     threadTs,

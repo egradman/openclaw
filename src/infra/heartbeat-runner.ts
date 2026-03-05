@@ -611,6 +611,10 @@ export async function runHeartbeatOnce(opts: {
   const { isCronEventReason, pendingEventEntries } = preflight;
   const previousUpdatedAt = entry?.updatedAt;
   const delivery = resolveHeartbeatDeliveryTarget({ cfg, entry, heartbeat });
+  if (opts.reason?.includes("extendo")) {
+    console.error(`[heartbeat-extendo] sessionKey=${sessionKey} delivery=${JSON.stringify({ channel: delivery.channel, to: delivery.to, threadId: delivery.threadId, reason: delivery.reason })}`);
+    console.error(`[heartbeat-extendo] entry.deliveryContext=${JSON.stringify((entry as any)?.deliveryContext)}`);
+  }
   const heartbeatAccountId = heartbeat?.accountId?.trim();
   if (delivery.reason === "unknown-account") {
     log.warn("heartbeat: unknown accountId", {
